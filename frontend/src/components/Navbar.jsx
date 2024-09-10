@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [isDropDown, setIsDropDown] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
+
+  const { currentUser } = useSelector((state) => state.user);
 
   return (
     <header className="bg-white relative shadow-md z-50">
@@ -44,34 +47,53 @@ const Navbar = () => {
         >
           <FaBars size={24} />
         </button>
-        <div className="relative hidden md:block">
-          <img
-            src="https://picsum.photos/200"
-            alt="Profile Pic"
-            height={40}
-            width={40}
-            className="rounded-full border-2 border-purple-600 hover:shadow-lg transition-all duration-300 cursor-pointer"
-            onMouseEnter={() => setIsDropDown(true)}
-            onMouseLeave={() => setIsDropDown(false)}
-          />
-          <div
-            className={`absolute py-2 right-0 w-48 bg-white rounded-md shadow-xl flex-col border ${
-              isDropDown ? "flex" : "hidden"
-            } `}
-            onMouseEnter={() => setIsDropDown(true)}
-            onMouseLeave={() => setIsDropDown(false)}
-          >
-            <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-              Account
+        {currentUser ? (
+          <>
+            <div className="relative hidden md:block">
+              <img
+                src="https://picsum.photos/200"
+                alt="Profile Pic"
+                height={40}
+                width={40}
+                className="rounded-full border-2 border-purple-600 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onMouseEnter={() => setIsDropDown(true)}
+                onMouseLeave={() => setIsDropDown(false)}
+              />
+              <div
+                className={`absolute py-2 right-0 w-48 bg-white rounded-md shadow-xl flex-col border ${
+                  isDropDown ? "flex" : "hidden"
+                } `}
+                onMouseEnter={() => setIsDropDown(true)}
+                onMouseLeave={() => setIsDropDown(false)}
+              >
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Account
+                </Link>
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Profile
+                </Link>
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Log Out
+                </Link>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/login"
+              className="font-semibold hover:text-underline text-purple-700"
+            >
+              Log In
             </Link>
-            <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-              Profile
-            </Link>
-            <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-              Log Out
+            <Link
+              to="/signup"
+              className="py-2 px-4 bg-purple-700 text-white rounded-md hover:bg-purple-800 transition-all duration-300 shadow-md hover:shadow-xl"
+            >
+              Sign Up
             </Link>
           </div>
-        </div>
+        )}
       </nav>
       {isMobileMenu && (
         <div className="fixed inset-0 bg-black opacity-50 z-10"></div>
@@ -114,30 +136,51 @@ const Navbar = () => {
               Contact
             </Link>
           </li>
-          <li className="relative" onClick={() => setIsDropDown(!isDropDown)}>
-            <button
-              type=""
-              className="flex items-center text-gray-700 font-semibold"
-            >
-              <FaUserCircle size={24} />
-              <span className="ml-2">Profile</span>
-            </button>
-            <div
-              className={`absolute py-2 right-0 w-48 mt-1 bg-white rounded-md shadow-xl flex-col border ${
-                isDropDown ? "flex" : "hidden"
-              } z-30`}
-            >
-              <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-                Account
-              </Link>
-              <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-                Profile
-              </Link>
-              <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
-                Log Out
-              </Link>
-            </div>
-          </li>
+          {currentUser ? (
+            <li className="relative" onClick={() => setIsDropDown(!isDropDown)}>
+              <button
+                type=""
+                className="flex items-center text-gray-700 font-semibold"
+              >
+                <FaUserCircle size={24} />
+                <span className="ml-2">Profile</span>
+              </button>
+              <div
+                className={`absolute py-2 right-0 w-48 mt-1 bg-white rounded-md shadow-xl flex-col border ${
+                  isDropDown ? "flex" : "hidden"
+                } z-30`}
+              >
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Account
+                </Link>
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Profile
+                </Link>
+                <Link className="px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-300">
+                  Log Out
+                </Link>
+              </div>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link
+                  to="/login"
+                  className="font-semibold hover:text-underline text-purple-700"
+                >
+                  Log In
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/signup"
+                  className="py-2 px-4 bg-purple-700 text-white rounded-md hover:bg-purple-800 transition-all duration-300 shadow-md hover:shadow-xl"
+                >
+                  Sign Up
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </header>

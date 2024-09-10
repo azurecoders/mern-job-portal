@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordChecklist from "react-password-checklist";
+import {
+  accountFailure,
+  accountStart,
+  accountSuccess,
+} from "../redux/userSlice/userSlice.js";
+import { useSelector, useDispatch } from "react-redux";
 
 const AuthForm = ({ isSignup }) => {
   const navigate = useNavigate();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const dispatch = useDispatch();
+  const { loading, error, currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,13 +33,15 @@ const AuthForm = ({ isSignup }) => {
           formData.email == "" ||
           formData.password == "" ||
           formData.role == "" ||
-          validPassword
-      : formData.email == "" || formData.password == "";
+          validPassword ||
+          loading
+      : formData.email == "" || formData.password == "" || loading;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(accountStart());
       const url = isSignup
         ? "http://localhost:5000/api/auth/signup"
         : "http://localhost:5000/api/auth/login";
@@ -59,21 +68,21 @@ const AuthForm = ({ isSignup }) => {
       });
       const data = await apiResponse.json();
       if (apiResponse.ok) {
-        localStorage.setItem("userInfo", JSON.stringify(data));
-        navigate("/");
+        dispatch(accountSuccess(data));
+        navigate("/dashboard");
       } else {
-        console.log(data.message);
+        dispatch(accountFailure(data.message));
       }
     } catch (error) {
-      console.log(error);
+      dispatch(accountFailure(error.message));
     }
   };
 
   useEffect(() => {
-    if (userInfo) {
-      navigate("/");
+    if (currentUser) {
+      navigate("/dashboard");
     }
-  }, [userInfo, navigate]);
+  }, [currentUser, navigate]);
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center">
@@ -156,7 +165,7 @@ const AuthForm = ({ isSignup }) => {
           disabled={isValidData()}
           className="disabled:opacity-75 disabled:cursor-not-allowed w-full text-center bg-purple-600 p-3 rounded-sm hover:bg-purple-500 text-white transition-all duration-500"
         >
-          Submit
+          {loading ? "Loading..." : "Submit"}
         </button>
         <div className="text-center text-sm text-purple-700 hover:underline">
           {isSignup ? (
